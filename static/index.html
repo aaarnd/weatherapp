@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Weather App</title>
+
+  <!-- Подключаем Weather Icons CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/weather-icons/2.0.10/css/weather-icons.min.css">
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #e0f7fa, #ffffff);
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    h1 {
+      color: #00796b;
+    }
+
+    form {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+      justify-content: center;
+    }
+
+    input[type="text"] {
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      width: 250px;
+    }
+
+    button {
+      padding: 10px 20px;
+      background-color: #00796b;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #004d40;
+    }
+
+    #result {
+      max-width: 500px;
+      width: 100%;
+    }
+
+    #result > div {
+      background-color: #ffffffdd;
+      border: 1px solid #ccc;
+      border-left: 5px solid #00796b;
+      border-radius: 4px;
+      padding: 15px;
+      margin-bottom: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    #result h3 {
+      margin: 0 0 10px;
+      color: #004d40;
+      flex: 1 1 auto;
+    }
+
+    #result p {
+      margin: 4px 0;
+      font-size: 15px;
+    }
+
+    .wi {
+      font-size: 48px;
+      color: #00796b;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>Погода в городе</h1>
+  <form id="weather-form">
+    <input type="text" id="city-input" name="city" list="suggestions" autocomplete="off" required>
+    <datalist id="suggestions"></datalist>
+    <button type="submit">Узнать погоду</button>
+  </form>
+
+  <div id="result"></div>
+
+  <script>
+    const weatherDescriptions = {
+      0: "Ясно", 1: "В основном ясно", 2: "Частично облачно", 3: "Пасмурно", 45: "Туман", 48: "Иней",
+      51: "Слабая морось", 53: "Морось", 55: "Сильная морось", 56: "Замерзающая морось", 57: "Сильная замерзающая морось",
+      61: "Легкий дождь", 63: "Дождь", 65: "Сильный дождь", 66: "Замерзающий дождь", 67: "Сильный замерзающий дождь",
+      71: "Легкий снег", 73: "Снег", 75: "Сильный снег", 77: "Снежные зерна",
+      80: "Ливень", 81: "Умеренный ливень", 82: "Сильный ливень",
+      85: "Легкий снегопад", 86: "Сильный снегопад",
+      95: "Гроза", 96: "Гроза с градом", 99: "Гроза с сильным градом"
+    };
+
+    // Функция сопоставляет weathercode к классу иконки из Weather Icons
+    function getWeatherIconClass(code) {
+      switch(code) {
+        case 0: return "wi-day-sunny";
+        case 1: return "wi-day-sunny-overcast";
+        case 2: return "wi-day-cloudy";
+        case 3: return "wi-cloudy";
+        case 45:
+        case 48: return "wi-fog";
+        case 51:
+        case 53:
+        case 55: return "wi-sprinkle";
+        case 56:
+        case 57: return "wi-sleet";
+        case 61:
+        case 63:
+        case 65: return "wi-rain";
+        case 66:
+        case 67: return "wi-rain-mix";
+        case 71:
+        case 73:
+        case 75: return "wi-snow";
+        case 77: return "wi-snow-wind";
+        case 80:
+        case 81:
+        case 82: return "wi-showers";
+        case 85:
+        case 86: return "wi-snow";
+        case 95:
+        case 96:
+        case 99: return "wi-thunderstorm";
+        default: return "wi-na";
+      }
+    }
+
+    function renderForecast(data) {
+      const container = document.getElementById("result");
+      container.innerHTML = "";
+
+      for (let i = 0; i < data.time.length; i++) {
+        const date = data.time[i];
+        const tMin = data.temperature_2m_min[i];
+        const tMax = data.temperature_2m_max[i];
+        const code = data.weathercode[i];
+        const condition = weatherDescriptions[code] || "Неизвестно";
+        const iconClass = getWeatherIconClass(code);
+
+        const dayHTML = `
+          <div>
+            <i class="wi ${iconClass}"></i>
+            <div>
+              <h3>${date}</h3>
+              <p>${condition}</p>
+              <p>Мин: ${tMin}°C, Макс: ${tMax}°C</p>
+            </div>
+          </div>
+        `;
+        container.innerHTML += dayHTML;
+      }
+    }
+
+    document.getElementById("weather-form").addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const cityInput = document.getElementById("city-input");
+      const city = cityInput.value.trim();
+      const result = document.getElementById("result");
+      result.innerHTML = "";
+
+      if (!city) {
+        result.textContent = "Введите название города.";
+        return;
+      }
+
+      try {
+        const response = await fetch(`/weather?city=${encodeURIComponent(city)}`);
+        if (!response.ok) throw new Error("Ошибка запроса к серверу");
+
+        const data = await response.json();
+
+        if (data.daily) {
+          renderForecast(data.daily);
+        } else if (data.temperature && data.condition) {
+          result.innerHTML = `
+            <h2>${data.city}</h2>
+            <p>${data.temperature}°C, ${data.condition}</p>
+          `;
+        } else {
+          result.textContent = "Не удалось получить данные о погоде.";
+        }
+      } catch (err) {
+        result.textContent = "Произошла ошибка: " + err.message;
+      }
+    });
+  </script>
+</body>
+</html>
