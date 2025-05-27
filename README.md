@@ -27,21 +27,25 @@ translators
 Установка
 
 Клонируйте репозиторий:
-git clone <URL_репозитория>
-cd weatherapp
+  ```bash
+  git clone <URL_репозитория>
+  cd weatherapp
 
 
 Создайте виртуальное окружение и активируйте его:
-python -m venv venv
-source venv/bin/activate  # Linux/Mac
-venv\Scripts\activate     # Windows
+  ```bash
+  python -m venv venv
+  source venv/bin/activate  # Linux/Mac
+  venv\Scripts\activate     # Windows
 
 
 Установите зависимости:
-pip install -r requirements.txt
+  ```bash
+  pip install -r requirements.txt
 
 Запустите приложение:
-uvicorn main:app --reload
+  ```bash
+  uvicorn main:app --reload
 
 
 Откройте браузер и перейдите по адресу http://localhost:8000.
