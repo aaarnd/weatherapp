@@ -9,20 +9,10 @@
 
 ## Технологии
 
-Backend: FastAPI, Pydantic
-API: Open-Meteo (погода), Google Translate (перевод)
-Хранение данных: В памяти (словари user_history, cities_count)
-Frontend: Статический HTML (index.html)
-
-## Требования
-
-Python 3.8+
-Зависимости, указанные в requirements.txt:python-dotenv
-fastapi
-pydantic
-translators
-
-
+1. Backend: FastAPI, Pydantic
+2. API: Open-Meteo (погода), Google Translate (перевод)
+3. Хранение данных: В памяти (словари user_history, cities_count)
+4. Frontend: Статический HTML (index.html)
 
 ## Установка
 
