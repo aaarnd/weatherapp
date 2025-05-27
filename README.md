@@ -30,6 +30,7 @@ translators
   ```bash
   git clone <URL_репозитория>
   cd weatherapp
+  ```
 
 
 Создайте виртуальное окружение и активируйте его:
@@ -37,16 +38,17 @@ translators
   python -m venv venv
   source venv/bin/activate  # Linux/Mac
   venv\Scripts\activate     # Windows
-
+  ```
 
 Установите зависимости:
   ```bash
   pip install -r requirements.txt
+  ```
 
 Запустите приложение:
   ```bash
   uvicorn main:app --reload
-
+  ```
 
 Откройте браузер и перейдите по адресу http://localhost:8000.
 
